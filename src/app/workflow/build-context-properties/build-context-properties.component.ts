@@ -69,7 +69,7 @@ export class BuildContextPropertiesComponent implements OnInit {
    */
   ngOnInit() {
     this.form = this.fb.group({
-      name: new FormControl('', Validators.required),
+      name: new FormControl('', Validators.required)
       // deployType: new FormControl('', Validators.required)
     });
 
@@ -88,22 +88,26 @@ export class BuildContextPropertiesComponent implements OnInit {
 
     this.occoSVC.buildWorkflow(this.buildTemplate.descriptor).subscribe(
       (res: any) => {
+        // We emit to the parent component the neccessary data.
         console.log(res);
         this.deployment.infraid = res.infraid;
         this.deployment.templateKey = this.buildTemplate.$key;
         this.deployment.graph = this.buildTemplate.graph;
         this.onSubmitDialog.emit(this.deployment);
+
+        // reset the form.
+        this.myNgForm.resetForm();
+
+        // subscribe to notifications.
+        this.occoSVC
+          .subscribeToInfraChanges(res.infraid)
+          .subscribe((response: any) => {
+          });
       },
       error => {
         console.log(this.deployment);
-        this.deployment.infraid = 'kamuid';
-        this.deployment.templateKey = this.buildTemplate.$key;
-        this.deployment.graph = this.buildTemplate.graph;
-        this.onSubmitDialog.emit(this.deployment);
-        console.log(error);
+        window.alert(error);
       }
     );
-
-    this.myNgForm.resetForm();
   }
 }

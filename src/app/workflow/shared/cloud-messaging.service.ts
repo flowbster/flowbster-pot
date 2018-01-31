@@ -17,9 +17,13 @@ import { AngularFireDatabase } from 'angularfire2/database';
  */
 @Injectable()
 export class CloudMessagingService {
-
   /**Instance to hold the firebase messaging utilities */
   messaging = firebase.messaging();
+
+  /**
+   * The actual registration token that is used
+   */
+  currentToken = new BehaviorSubject(null);
 
   /**A subscribable stream for the current message */
   currentMessage = new BehaviorSubject(null);
@@ -59,7 +63,7 @@ export class CloudMessagingService {
   receiveMessage() {
     this.messaging.onMessage(payload => {
       console.log('Message received. ', payload);
-      this.currentMessage.next(payload);
+      // this.currentMessage.next(payload);
     });
   }
 
@@ -73,9 +77,9 @@ export class CloudMessagingService {
         console.log('returning');
         return;
       }
-
       const data = { [user.uid]: token };
       this.db.object('fcmTokens/').update(data);
+      this.currentToken.next(token);
     });
   }
 }

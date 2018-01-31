@@ -1,3 +1,4 @@
+import { CloudMessagingService } from './../shared/cloud-messaging.service';
 import { DataAccessHelper } from './../shared/DataAccessHelper';
 import { Component, OnInit } from '@angular/core';
 import { WorkflowEntryService } from 'app/workflow/shared/workflow-entry.service';
@@ -11,6 +12,7 @@ import { ConfirmationService } from 'primeng/components/common/confirmationservi
 import { TemplateService } from 'app/workflow/shared/template.service';
 import { DeploymentService } from 'app/workflow/shared/deployment.service';
 import { Deployment } from 'app/workflow/shared/deployment';
+import { Observable } from 'rxjs/Observable';
 
 /**
  * Holds the logic for the whole Workflow Manager datatable.
@@ -22,6 +24,16 @@ import { Deployment } from 'app/workflow/shared/deployment';
   providers: [ConfirmationService]
 })
 export class WorkflowManagerComponent implements OnInit {
+  /**
+   * Holds information about the Occopus tools event messages
+   */
+  message: string;
+
+  /**
+   * Holds information about the Occopus tools event messages
+   */
+  message$;
+
   /**
    * The holder array of the database records that is shown in the datatable.
    */
@@ -51,7 +63,7 @@ export class WorkflowManagerComponent implements OnInit {
     private jointSVC: JointService,
     private confirmSVC: ConfirmationService,
     private deploymentSVC: DeploymentService,
-    // private workflowEntrySVC: WorkflowEntryService
+    private cloudMessagingSVC: CloudMessagingService // private workflowEntrySVC: WorkflowEntryService
   ) {}
 
   /**
@@ -64,6 +76,7 @@ export class WorkflowManagerComponent implements OnInit {
 
     this.buildContextDialogVisible = false;
     this.buildContextEntry = DataAccessHelper.initTemplate();
+    this.initializeCloudMessaging();
   }
 
   /**
@@ -96,6 +109,7 @@ export class WorkflowManagerComponent implements OnInit {
    */
   onDeployContextSubmit(deployment: Deployment) {
     this.buildContextDialogVisible = false;
+
     this.deploymentSVC.saveEntry(deployment);
   }
 
@@ -158,6 +172,20 @@ export class WorkflowManagerComponent implements OnInit {
 
     this.cleanSelection(toBeDeletedFromSelection);
   }
+
+  /**
+   * The Messaging service subscribes to the messaging feed.
+   */
+  private initializeCloudMessaging(): void {
+    this.cloudMessagingSVC.receiveMessage();
+    this.message$ = this.cloudMessagingSVC.currentMessage;
+
+    this.cloudMessagingSVC.currentMessage.subscribe(message => {
+      console.log('CLOUDMESSAGE!', message);
+      this.message = message;
+    });
+  }
+
   /**
    * If there is any entry selected its infrastructure data gets sent via Http to Occopus.
    */

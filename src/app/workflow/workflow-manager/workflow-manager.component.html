@@ -2,6 +2,13 @@
 
 <br>
 
+<!-- <!-- Current Message: -->
+<h1>{{(message$ | async)?.notificiation.title}}</h1>
+<!-- <img [src]="(message$ | async)?.notificiation.icon" width="100px"> -->
+<p>{{(message$ | async )?.notification.body}}</p>
+
+{{ message$ | async | json}} <br> -->
+
 <p-dataTable [value]="workflowEntries" [(selection)]="selectedWorkflowEntries" [headerCheckboxToggleAllPages]="true" dataKey="$key"
   [globalFilter]="gb" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]" expandableRows="true">
   <p-header>Workflow Templates
