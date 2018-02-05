@@ -168,6 +168,13 @@ export class ToolbarComponent implements OnInit {
             command: event => {
               this.jointSVC.downloadGraph('graph.json', 'application/json');
             }
+          },
+          {
+            label: 'NodeNames',
+            icon: 'fa-donwload',
+            command: event => {
+              console.log(this.jointSVC.getNodeNames());
+            }
           }
         ]
       }

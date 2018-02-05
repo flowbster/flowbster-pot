@@ -61,8 +61,8 @@ export class CloudMessagingService {
    * Whenever we receive a message it feeds the datastream.
    */
   receiveMessage() {
-    this.messaging.onMessage(payload => {
-      console.log('Message received. ', payload);
+    this.messaging.onMessage((payload: { data: any }) => {
+      console.log('Message received. ', payload.data);
       // this.currentMessage.next(payload);
     });
   }

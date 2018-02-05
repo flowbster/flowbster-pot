@@ -139,10 +139,10 @@ export class OccoService {
 
     return this.http.get(endpoint, { responseType: 'text' }).do(
       res => {
-        console.log(res);
+        // console.log(res);
       },
       error => {
-        console.log('error occured', error);
+        // console.log('error occured', error);
       }
     );
   }
