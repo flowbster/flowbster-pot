@@ -24,11 +24,6 @@ export interface WorkflowEntry {
   graph: string;
 
   /**
-   * The collection of node status information
-   */
-  nodeCollection: NodeInfo[];
-
-  /**
    * The ID of the saved database record for this Entry.
    */
   $key?: any;

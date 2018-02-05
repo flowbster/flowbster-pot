@@ -1,3 +1,5 @@
+import { NodeInfo } from 'app/workflow/shared/nodeInfo';
+
 /**
  * The second layer datatable record entity. It holds information about a contextualized template in the cloud with the Occopus tool.
  */
@@ -42,6 +44,8 @@ export interface Deployment {
    * The deployments actual Status based on the constructed infrastructure. (Active,Pending,Down)
    */
   status?: Status;
+
+  nodeCollection?: NodeInfo[];
 
   /**
    * The template's "free" input port's constructed IP adresses at the chosen provider.

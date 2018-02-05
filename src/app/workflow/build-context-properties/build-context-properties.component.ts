@@ -1,3 +1,4 @@
+import { JointService } from 'app/editor/flowbster-forms/shared/joint.service';
 import { Deployment, DeploymentType } from './../shared/deployment';
 import {
   FormGroup,
@@ -16,6 +17,7 @@ import {
 } from '@angular/core';
 import { OccoService } from 'app/workflow/shared/occo.service';
 import { AngularFirestore } from 'angularfire2/firestore';
+import { NodeInfo } from 'app/workflow/shared/nodeInfo';
 
 /**
  * Holds logic of the Deployments layer build context.
@@ -61,7 +63,11 @@ export class BuildContextPropertiesComponent implements OnInit {
    * @param fb
    * @param occoSVC
    */
-  constructor(private fb: FormBuilder, private occoSVC: OccoService) {}
+  constructor(
+    private fb: FormBuilder,
+    private occoSVC: OccoService,
+    private jointSVC: JointService
+  ) {}
 
   /**
    * Initializes the formGroup and its Form Controls.
@@ -93,6 +99,7 @@ export class BuildContextPropertiesComponent implements OnInit {
         this.deployment.infraid = res.infraid;
         this.deployment.templateKey = this.buildTemplate.$key;
         this.deployment.graph = this.buildTemplate.graph;
+        this.deployment.nodeCollection = this.populateCollection();
         this.onSubmitDialog.emit(this.deployment);
 
         // reset the form.
@@ -101,13 +108,21 @@ export class BuildContextPropertiesComponent implements OnInit {
         // subscribe to notifications.
         this.occoSVC
           .subscribeToInfraChanges(res.infraid)
-          .subscribe((response: any) => {
-          });
+          .subscribe((response: any) => {});
       },
       error => {
         console.log(this.deployment);
         window.alert(error);
       }
     );
+  }
+
+  private populateCollection(): NodeInfo[] {
+    const collection: NodeInfo[] = [];
+    this.jointSVC.getNodeNames().forEach(nodeName => {
+      collection.push({ name: nodeName, instances: 1, ip_address: '', status: 'INACTIVE' });
+    });
+
+    return collection;
   }
 }
