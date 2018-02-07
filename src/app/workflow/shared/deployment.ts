@@ -45,7 +45,10 @@ export interface Deployment {
    */
   status?: Status;
 
-  nodeCollection?: NodeInfo[];
+  /**
+   * The Node names which are going to be used in the workflow.
+   */
+  nodeCollection?: string[];
 
   /**
    * The template's "free" input port's constructed IP adresses at the chosen provider.

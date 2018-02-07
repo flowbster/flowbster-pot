@@ -1,5 +1,5 @@
-import { InfraInfo } from './infraInfo';
 import { Component, OnInit, Input } from '@angular/core';
+import { NodeInfo } from 'app/workflow/shared/nodeInfo';
 
 @Component({
   selector: 'toil-infra-details',
@@ -7,7 +7,7 @@ import { Component, OnInit, Input } from '@angular/core';
   styleUrls: ['./infra-details.component.scss']
 })
 export class InfraDetailsComponent implements OnInit {
-  @Input() infraCollection: InfraInfo[];
+  @Input() nodeCollection: NodeInfo[];
 
   constructor() {}
 

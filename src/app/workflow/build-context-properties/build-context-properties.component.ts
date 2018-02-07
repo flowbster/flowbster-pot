@@ -99,7 +99,9 @@ export class BuildContextPropertiesComponent implements OnInit {
         this.deployment.infraid = res.infraid;
         this.deployment.templateKey = this.buildTemplate.$key;
         this.deployment.graph = this.buildTemplate.graph;
-        this.deployment.nodeCollection = this.populateCollection();
+        this.deployment.nodeCollection = this.populateCollection(
+          this.buildTemplate.graph
+        );
         this.onSubmitDialog.emit(this.deployment);
 
         // reset the form.
@@ -117,12 +119,8 @@ export class BuildContextPropertiesComponent implements OnInit {
     );
   }
 
-  private populateCollection(): NodeInfo[] {
-    const collection: NodeInfo[] = [];
-    this.jointSVC.getNodeNames().forEach(nodeName => {
-      collection.push({ name: nodeName, instances: 1, ip_address: '', status: 'INACTIVE' });
-    });
-
-    return collection;
+  private populateCollection(graphText: string): string[] {
+    this.jointSVC.uploadGraph(JSON.parse(graphText));
+    return this.jointSVC.getNodeNames();
   }
 }

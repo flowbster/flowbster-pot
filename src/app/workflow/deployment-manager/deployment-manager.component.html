@@ -47,6 +47,6 @@
   <!-- <toil-experiment-context-properties></toil-experiment-context-properties> -->
 </p-dialog>
 
-<p-dialog header="Node information for " [modal]="true" [(visible)]="infoModalVisible">
-  <p-header> {{contextEntry.name}} deployment</p-header>
+<p-dialog header="Infrastructure Information" [modal]="true" [(visible)]="infoModalVisible">
+  <toil-infra-details [nodeCollection]="nodeCollection"></toil-infra-details>
 </p-dialog>

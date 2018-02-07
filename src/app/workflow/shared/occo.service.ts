@@ -1,3 +1,4 @@
+import { InfraInfo } from './../infra-details/infraInfo';
 import { environment } from './../../../environments/environment.prod';
 import { CloudMessagingService } from 'app/workflow/shared/cloud-messaging.service';
 import { AuthService } from 'app/core/auth.service';
@@ -134,17 +135,17 @@ export class OccoService {
    * @param infraid
    * @param entryId
    */
-  getWorkflowInformation(infraid: string): Observable<string> {
+  getWorkflowInformation(infraid: string): Observable<InfraInfo[]> {
     const endpoint = this.url + '/infrastructures/' + infraid;
 
-    return this.http.get(endpoint, { responseType: 'text' }).do(
-      res => {
-        // console.log(res);
-      },
-      error => {
-        // console.log('error occured', error);
-      }
-    );
+    return this.http.get(endpoint, { responseType: 'text' }).map(result => {
+      const infraObject = JSON.parse(result);
+      const infraCollection: InfraInfo[] = [];
+      Object.keys(infraObject).forEach(nodeKey => {
+        infraCollection.push({ ...infraObject[`${nodeKey}`], name: nodeKey });
+      });
+      return infraCollection;
+    });
   }
 
   subscribeToInfraChanges(infraid: string) {
@@ -156,7 +157,8 @@ export class OccoService {
     const notifyDict = {
       type: 'fcm',
       fcm: {
-        api_key: 'AAAA7A_h75s:APA91bHWZ9d_6ohQ9FyO8Whi1r4Ai84wXqWNXlozb2k4SZG9SkTn7RfEcj8yBobgKibhCquewjd5K7eAFKhYoy1sXfmPF4YFXIbxUntukVX02U5iMN94hFxeIuYb3JoVJf0SsEF79xRP',
+        api_key:
+          'AAAA7A_h75s:APA91bHWZ9d_6ohQ9FyO8Whi1r4Ai84wXqWNXlozb2k4SZG9SkTn7RfEcj8yBobgKibhCquewjd5K7eAFKhYoy1sXfmPF4YFXIbxUntukVX02U5iMN94hFxeIuYb3JoVJf0SsEF79xRP',
         reg_id: this.cloudMessagingSVC.currentToken.value
       }
     };
