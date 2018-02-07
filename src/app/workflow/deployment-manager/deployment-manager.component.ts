@@ -111,7 +111,8 @@ export class DeploymentManagerComponent extends ManagerComponent<
     entry: Deployment,
     infraStatus: InfraInfo[]
   ): void {
-    console.log(infraStatus); // kiszámolni mi az aktuál statuszt és updatelni az adatbázist.
+    this.nodeCollection = [];
+    console.log(infraStatus);
     infraStatus.forEach(node => {
       const states = this.getStates(node.instances);
       this.nodeCollection.push({

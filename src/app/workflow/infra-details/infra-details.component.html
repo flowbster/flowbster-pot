@@ -1,1 +1,32 @@
-{{ nodeCollection | json}}
+<!-- <mat-list>
+  <h3 matSubheader>Nodes</h3>
+  <mat-list-item *ngFor="let node of nodeCollection">
+    <h3 matLine> Name: {{node.name}} </h3>
+    <p matLine> Instances: {{node.instances}} </p>
+    <section *ngFor="let status of node.states">
+      <p matLine>IP: {{status.ip_address}}</p>
+      <p matLine>State: {{status.state}}</p>
+      <p matLine>Node_ID : {{ status.node_id}}</p>
+    </section>
+  </mat-list-item>
+</mat-list> -->
+
+<mat-expansion-panel *ngFor="let node of nodeCollection">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      {{node.name}}
+    </mat-panel-title>
+    <mat-panel-description>
+      {{node.instances}} instance is already running.
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+
+  <mat-list>
+    <mat-list-item *ngFor="let status of node.states">
+        <p matLine>IP: {{status.ip_address}}</p>
+        <p matLine>State: {{status.state}}</p>
+        <p matLine>Node_ID : {{ status.node_id}}</p>
+    </mat-list-item>
+  </mat-list>
+
+</mat-expansion-panel>
