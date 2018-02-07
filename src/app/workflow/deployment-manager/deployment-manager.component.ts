@@ -10,6 +10,7 @@ import { ConfirmationService } from 'primeng/components/common/confirmationservi
 import { NodeInfo, StateInfo } from 'app/workflow/shared/nodeInfo';
 
 import { map } from 'rxjs/operators';
+import { CloudMessagingService } from 'app/workflow/shared/cloud-messaging.service';
 
 /**
  * Holds logic of the datatable of the deployment records and its interactions.
@@ -42,10 +43,32 @@ export class DeploymentManagerComponent extends ManagerComponent<
   constructor(
     private deploymentSVC: DeploymentService,
     private confirmSVC: ConfirmationService,
-    private occoSVC: OccoService
+    private occoSVC: OccoService,
+    private cloudMessagingSVC: CloudMessagingService
   ) {
     super(deploymentSVC);
     this.infoModalVisible = false;
+    this.cloudMessagingSVC.currentMessage.subscribe(data => {
+      if (data) {
+        const payload = JSON.parse(data.payload);
+        console.log(payload); // az első nodecreatingről nem kapunk eseményt.
+
+        if (
+          data.event_name === 'nodecreating' ||
+          data.event_name === 'nodecreated'
+        ) {
+          const deployment = this.dataTableEntries.find(
+            deploy => deploy.infraid === payload.infra_id
+          ); // megszerezzuk az aktuális deploymentet
+          console.log(deployment);
+          this.occoSVC
+            .getWorkflowInformation(deployment.infraid)
+            .subscribe((infraCollection: InfraInfo[]) => {
+              this.updateNodeCollection(deployment, infraCollection);
+            });
+        }
+      }
+    });
   }
 
   /**

@@ -1,3 +1,5 @@
+import { OccoService } from 'app/workflow/shared/occo.service';
+import { CloudMessagingService } from './../shared/cloud-messaging.service';
 import { Component, OnInit, Input } from '@angular/core';
 import { NodeInfo } from 'app/workflow/shared/nodeInfo';
 
@@ -7,9 +9,11 @@ import { NodeInfo } from 'app/workflow/shared/nodeInfo';
   styleUrls: ['./infra-details.component.scss']
 })
 export class InfraDetailsComponent implements OnInit {
-  @Input() nodeCollection: NodeInfo[];
+  @Input() nodeCollection: NodeInfo[] = [];
 
-  constructor() {}
+  constructor(
+  ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 }

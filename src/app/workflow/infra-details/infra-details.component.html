@@ -17,15 +17,18 @@
       {{node.name}}
     </mat-panel-title>
     <mat-panel-description>
-      {{node.instances}} instance is already running.
+      {{node.instances}} instance is already up.
     </mat-panel-description>
   </mat-expansion-panel-header>
 
   <mat-list>
     <mat-list-item *ngFor="let status of node.states">
-        <p matLine>IP: {{status.ip_address}}</p>
-        <p matLine>State: {{status.state}}</p>
-        <p matLine>Node_ID : {{ status.node_id}}</p>
+      <p matLine>Node_ID : {{ status.node_id}}</p>
+      <p matLine>IP: {{status.ip_address}}</p>
+      <p matLine>State: {{status.state}}</p>
+      <div fxLayout>
+        <mat-progress-spinner *ngIf="status.state === 'pending'" fxFlex="40%" mode="indeterminate"></mat-progress-spinner>
+      </div>
     </mat-list-item>
   </mat-list>
 

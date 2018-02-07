@@ -63,7 +63,7 @@ export class CloudMessagingService {
   receiveMessage() {
     this.messaging.onMessage((payload: { data: any }) => {
       console.log('Message received. ', payload.data);
-      // this.currentMessage.next(payload);
+      this.currentMessage.next(payload.data);
     });
   }
 

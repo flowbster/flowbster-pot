@@ -180,10 +180,6 @@ export class WorkflowManagerComponent implements OnInit {
     this.cloudMessagingSVC.receiveMessage();
     this.message$ = this.cloudMessagingSVC.currentMessage;
 
-    this.cloudMessagingSVC.currentMessage.subscribe(message => {
-      console.log('CLOUDMESSAGE!', message);
-      this.message = message;
-    });
   }
 
   /**
