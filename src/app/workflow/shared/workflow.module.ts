@@ -17,6 +17,7 @@ import { DeploymentManagerComponent } from 'app/workflow/deployment-manager/depl
 import { DeploymentService } from 'app/workflow/shared/deployment.service';
 import { ExperimentContextPropertiesComponent } from 'app/workflow/experiment-context-properties/experiment-context-properties.component';
 import { ExperimentManagerComponent } from 'app/workflow/experiment-manager/experiment-manager.component';
+import { FeederFileComponent } from '../feeder-file/feeder-file.component';
 
 @NgModule({
   imports: [CommonModule, SharedModule, EditorModule],
@@ -28,7 +29,8 @@ import { ExperimentManagerComponent } from 'app/workflow/experiment-manager/expe
     DeploymentManagerComponent,
     ExperimentContextPropertiesComponent,
     ExperimentManagerComponent,
-    InfraDetailsComponent
+    InfraDetailsComponent,
+    FeederFileComponent
   ],
   providers: [
     WorkflowEntryService,

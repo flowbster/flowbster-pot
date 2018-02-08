@@ -179,7 +179,6 @@ export class WorkflowManagerComponent implements OnInit {
   private initializeCloudMessaging(): void {
     this.cloudMessagingSVC.receiveMessage();
     this.message$ = this.cloudMessagingSVC.currentMessage;
-
   }
 
   /**

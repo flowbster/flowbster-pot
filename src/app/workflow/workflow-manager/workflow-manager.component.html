@@ -6,8 +6,6 @@
 <h1>{{(message$ | async)?.payload}}</h1>
 <!-- <img [src]="(message$ | async)?.notificiation.icon" width="100px"> -->
 
-{{ message$ | async | json}} <br> -->
-
 <p-dataTable [value]="workflowEntries" [(selection)]="selectedWorkflowEntries" [headerCheckboxToggleAllPages]="true" dataKey="$key"
   [globalFilter]="gb" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]" expandableRows="true">
   <p-header>Workflow Templates

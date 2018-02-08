@@ -66,6 +66,12 @@ export class DeploymentManagerComponent extends ManagerComponent<
             .subscribe((infraCollection: InfraInfo[]) => {
               this.updateNodeCollection(deployment, infraCollection);
             });
+        } else if (data.event_name === 'nodedropped') {
+          // this.occoSVC
+          //   .getWorkflowInformation(deployment.infraid)
+          //   .subscribe((infraCollection: InfraInfo[]) => {
+          //     this.updateNodeCollection(deployment, infraCollection);
+          //   });
         }
       }
     });
