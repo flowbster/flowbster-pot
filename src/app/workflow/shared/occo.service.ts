@@ -173,4 +173,32 @@ export class OccoService {
       () => {}
     );
   }
+
+  detachWorkflow(infraid: string) {
+    const endpoint = this.url + '/infrastructures/' + infraid + '/detach';
+
+    return this.http.post(endpoint, { infraid }).do(
+      res => {
+        console.log(res);
+      },
+      error => {
+        console.log('error occured', error);
+      },
+      () => {}
+    );
+  }
+
+  attachWorkflow(infraid: string) {
+    const endpoint = this.url + '/infrastructures/' + infraid + '/attach';
+
+    return this.http.post(endpoint,{infraid}).do(
+      res => {
+        console.log(res);
+      },
+      error => {
+        console.log('error occured', error);
+      },
+      () => {}
+    );
+  }
 }

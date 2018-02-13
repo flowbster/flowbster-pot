@@ -9,7 +9,7 @@
     <ng-template let-entry="rowData" pTemplate="body">
       <button type="button" pTooltip="Workflow Information" tooltipPosition="bottom" pButton icon="fa-pencil-square-o" (click)="onInfoClicked(entry)"></button>
       <button type="button" class="ui-button-danger" pButton (click)="confirmDeletion(entry)" icon="fa-trash-o"></button>
-      <!--<button type="button" class="ui-button-success" style="float:right" pButton (click)="onBuildClicked(entry)" icon="fa-cloud-upload"></button>-->
+      <!-- <button type="button" class="ui-button-success" style="float:right" pButton (click)="onAttachClick(entry)" icon="fa-ticket"></button> -->
       <button type="button" style="float:right" pButton (click)="onMagnifierClicked(entry)" icon="fa-eye"></button>
       <button type="button" pTooltip="Send" tooltipPosition="bottom" class="ui-button-success" style="float:right" pButton (click)="onModalButtonClick(entry)"
         icon="fa-play"></button>

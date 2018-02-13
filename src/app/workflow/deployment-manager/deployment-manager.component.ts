@@ -72,9 +72,19 @@ export class DeploymentManagerComponent extends ManagerComponent<
           //   .subscribe((infraCollection: InfraInfo[]) => {
           //     this.updateNodeCollection(deployment, infraCollection);
           //   });
+        } else if (data.event_name === 'infraready') {
+          const deployment = this.dataTableEntries.find(
+            deploy => deploy.infraid === payload.infra_id
+          );
+
+          this.occoSVC.detachWorkflow(deployment.infraid).subscribe();
         }
       }
     });
+  }
+
+  onAttachClick(entry: Deployment) {
+    this.occoSVC.attachWorkflow(entry.infraid).subscribe();
   }
 
   /**
