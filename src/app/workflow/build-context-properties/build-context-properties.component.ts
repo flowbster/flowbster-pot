@@ -105,9 +105,7 @@ export class BuildContextPropertiesComponent implements OnInit {
         this.deployment.targetNodeCount = this.getTargetNodes(
           this.buildTemplate.graph
         );
-        this.deployment.nodeProgress = Math.round(
-          100 / this.deployment.targetNodeCount
-        );
+        this.deployment.nodeProgress = 0;
         this.onSubmitDialog.emit(this.deployment);
 
         // reset the form.

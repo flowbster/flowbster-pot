@@ -1,10 +1,17 @@
+import { Subscription } from 'rxjs/Subscription';
 import { InfraInfo } from './../infra-details/infraInfo';
 import { Deployment } from './../shared/deployment';
 import { OccoService } from './../shared/occo.service';
 import { WorkflowEntry } from './../shared/workflowEntry';
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  EventEmitter,
+  Output,
+  OnDestroy
+} from '@angular/core';
 import { DeploymentService } from 'app/workflow/shared/deployment.service';
-import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { ManagerComponent } from 'app/workflow/shared/manager.component';
 import { ConfirmationService } from 'primeng/components/common/confirmationservice';
 import { NodeInfo, StateInfo } from 'app/workflow/shared/nodeInfo';
@@ -24,8 +31,10 @@ import { CloudMessagingService } from 'app/workflow/shared/cloud-messaging.servi
 export class DeploymentManagerComponent extends ManagerComponent<
   Deployment,
   WorkflowEntry
-> {
+> implements OnDestroy {
   infoModalVisible: boolean;
+
+  cloudMsgSubscription: Subscription;
 
   /**
    * Emits informations outside of the component whenever the 'Eye' icon is clicked.
@@ -47,40 +56,55 @@ export class DeploymentManagerComponent extends ManagerComponent<
     private cloudMessagingSVC: CloudMessagingService
   ) {
     super(deploymentSVC);
+    console.log('MOST LOGGOLOK');
     this.infoModalVisible = false;
-    this.cloudMessagingSVC.currentMessage.subscribe(data => {
-      if (data) {
-        const payload = JSON.parse(data.payload);
-        console.log(payload); // az első nodecreatingről nem kapunk eseményt.
+    this.cloudMsgSubscription = this.cloudMessagingSVC.currentMessage.subscribe(
+      data => {
+        if (data) {
+          const payload = JSON.parse(data.payload);
+          console.log(payload); // az első nodecreatingről nem kapunk eseményt.
+          console.log(this.dataTableEntries);
 
-        if (
-          data.event_name === 'nodecreating' ||
-          data.event_name === 'nodecreated'
-        ) {
-          const deployment = this.dataTableEntries.find(
-            deploy => deploy.infraid === payload.infra_id
-          ); // megszerezzuk az aktuális deploymentet
-          console.log(deployment);
-          this.occoSVC
-            .getWorkflowInformation(deployment.infraid)
-            .subscribe((infraCollection: InfraInfo[]) => {
-              this.updateNodeCollection(deployment, infraCollection);
-            }); // csak akkor szerzünk workflow detail információkat, hogyha rá kattint. ITT CSAK A PROGRESS BART NÖVELJÜK.
-        } else if (data.event_name === 'nodedropped') {
-          // this.occoSVC
-          //   .getWorkflowInformation(deployment.infraid)
-          //   .subscribe((infraCollection: InfraInfo[]) => {
-          //     this.updateNodeCollection(deployment, infraCollection);
-          //   });
-        } else if (data.event_name === 'infraready') {
-          const deployment = this.dataTableEntries.find(
-            deploy => deploy.infraid === payload.infra_id
-          );
+          if (this.dataTableEntries) {
+            const deployment = this.dataTableEntries.find(
+              deploy => deploy.infraid === payload.infra_id
+            ); // megszerezzuk az aktuális deploymentet
 
-          this.occoSVC.detachWorkflow(deployment.infraid).subscribe();
+            console.log(deployment);
+            const progressStep = Math.round(100 / deployment.targetNodeCount);
+
+            if (
+              data.event_name === 'nodecreated'
+              // || data.event_name === 'nodecreating'
+            ) {
+              deployment.nodeProgress += progressStep;
+              this.deploymentSVC.updateEntry(deployment); // we are updating the data that hides in the database.
+              console.log(deployment);
+              // this.occoSVC
+              //   .getWorkflowInformation(deployment.infraid)
+              //   .subscribe((infraCollection: InfraInfo[]) => {
+              //     this.updateNodeCollection(deployment, infraCollection);
+              //   }); // csak akkor szerzünk workflow detail információkat, hogyha rá kattint. ITT CSAK A PROGRESS BART NÖVELJÜK.
+            } else if (data.event_name === 'nodedropped') {
+              // this.occoSVC
+              //   .getWorkflowInformation(deployment.infraid)
+              //   .subscribe((infraCollection: InfraInfo[]) => {
+              //     this.updateNodeCollection(deployment, infraCollection);
+              //   });
+
+              deployment.nodeProgress -= progressStep;
+            } else if (data.event_name === 'infraready') {
+              deployment.nodeProgress = 100;
+              this.deploymentSVC.updateEntry(deployment);
+              this.occoSVC.detachWorkflow(deployment.infraid).subscribe();
+            } else if (data.event_name === 'infradrop') {
+              deployment.nodeProgress = 0;
+              this.deploymentSVC.updateEntry(deployment);
+            }
+          }
         }
       }
-    });
+    );
   }
 
   onAttachClick(entry: Deployment) {
@@ -179,5 +203,10 @@ export class DeploymentManagerComponent extends ManagerComponent<
       stateCollection.push(state);
     });
     return stateCollection;
+  }
+
+  ngOnDestroy() {
+    super.ngOnDestroy();
+    this.cloudMsgSubscription.unsubscribe();
   }
 }
