@@ -51,6 +51,16 @@ export interface Deployment {
   nodeCollection?: string[];
 
   /**
+   * The Node deployment process in numbers.
+   */
+  nodeProgress?: number;
+
+  /**
+   * The statically added node count for the actual deployment.
+   */
+  targetNodeCount?: number;
+
+  /**
    * The template's "free" input port's constructed IP adresses at the chosen provider.
    */
   starterPoint?: string[];

@@ -16,7 +16,8 @@ import {
   ContextMenuModule,
   ConfirmDialogModule,
   DataListModule,
-  TooltipModule
+  TooltipModule,
+  ProgressBarModule
 } from 'primeng/primeng';
 
 @NgModule({
@@ -36,7 +37,8 @@ import {
     ContextMenuModule,
     ConfirmDialogModule,
     DataListModule,
-    TooltipModule
+    TooltipModule,
+    ProgressBarModule
   ],
   exports: [
     MenuModule,
@@ -54,7 +56,8 @@ import {
     ContextMenuModule,
     ConfirmDialogModule,
     DataListModule,
-    TooltipModule
+    TooltipModule,
+    ProgressBarModule
   ]
 })
 export class PrimeModule {}

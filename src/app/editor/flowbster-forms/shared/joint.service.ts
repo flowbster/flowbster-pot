@@ -1,3 +1,4 @@
+import { FlowbsterFormsModule } from './flowbster-forms.module';
 import { Injectable } from '@angular/core';
 
 import { Workflow } from 'app/editor/flowbster-forms/workflow-properties/workflow';
@@ -13,13 +14,11 @@ import { Observable } from 'rxjs/Observable';
 import * as joint from 'jointjs';
 import * as _ from 'lodash';
 
-
 /**
  * Main Service that holds operations regarding the JointJS library.
  */
 @Injectable()
 export class JointService {
-
   /**
    * The actual CellView that has been selected on the paper.
    */
@@ -43,7 +42,7 @@ export class JointService {
   /**
    * The Papers data model.
    */
-  graph = new joint.dia.Graph;
+  graph = new joint.dia.Graph();
 
   /**
    * The paper object that has been associated with the given HTML element.
@@ -53,12 +52,12 @@ export class JointService {
   /**
    * Holder of the x and y coordinates where the user clicked on a blank paper.
    */
-  actualNodePlacement: { x: number, y: number };
+  actualNodePlacement: { x: number; y: number };
 
   /**
    * The actual node that has been selected to modify. Useful for input data changes.
    */
-  actualNode: FlowbsterNode
+  actualNode: FlowbsterNode;
 
   /**
    * The actual port that has been selected to modify. Useful for input data changes.
@@ -78,7 +77,7 @@ export class JointService {
   /**
    * An Observable datasource for watching, if the workflow have been initialized yet.
    */
-  isWorkflowInitialized: Subject<boolean>
+  isWorkflowInitialized: Subject<boolean>;
 
   // BONUS:  message events from proper linking and port creations and updates, and even nodes.
   // BONUS: on cancellation we reset the form again. a confirmation dialog.
@@ -137,7 +136,9 @@ export class JointService {
   isPortNameUniqueObservable(portName: string): Observable<boolean> {
     return new Observable(observer => {
       console.log('validate name against ports on the actual FlowbsterNode');
-      const element = this.getElementById(this.selectedCellView.model.id) as joint.shapes.devs.Model;
+      const element = this.getElementById(
+        this.selectedCellView.model.id
+      ) as joint.shapes.devs.Model;
 
       if (element) {
         const ports = element.getPorts();
@@ -150,7 +151,8 @@ export class JointService {
         }
         if (isUsed) {
           observer.next(false);
-        } {
+        }
+        {
           observer.next(true);
         }
       }
@@ -196,7 +198,6 @@ export class JointService {
    * @returns an Observable with the information about the nodeNames uniqueness
    */
   isNodeNameUniqueObservable(nodeName: string): Observable<boolean> {
-
     return new Observable(observer => {
       console.log('validate against nodes and workflowName');
       const element = this.getFlowbsterNodeElement(nodeName);
@@ -237,7 +238,9 @@ export class JointService {
    * @returns A collection of the node's name.
    */
   getNodeNames(): string[] {
-    console.log(this.graph.getElements().map(element => element.attr('.label/text')));
+    console.log(
+      this.graph.getElements().map(element => element.attr('.label/text'))
+    );
     return this.graph.getElements().map(element => element.attr('.label/text'));
   }
 
@@ -259,7 +262,7 @@ export class JointService {
       infraname: '',
       gatherip: null,
       gatherport: null,
-      receiverport: null,
+      receiverport: null
     };
   }
 
@@ -287,18 +290,19 @@ export class JointService {
    */
   downloadGraph(fileName: string, mimeType: string): void {
     if (this.graph) {
-
       const elHtml = JSON.stringify(this.getDownloadableGraph());
       const link = document.createElement('a');
       mimeType = mimeType || 'text/plain';
 
       link.setAttribute('download', fileName);
-      link.setAttribute('href', 'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(elHtml));
+      link.setAttribute(
+        'href',
+        'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(elHtml)
+      );
 
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
     } else {
       console.log('Graph is not present');
     }
@@ -412,17 +416,40 @@ export class JointService {
   }
 
   /**
+   * Gives back the demanded Node Count on the infrastructure.
+   */
+  getDeploymentNodeCount(): number {
+    let nodeCount = 0;
+
+    for (const nodeName of this.getNodeNames()) {
+      const flowbsterNode = this.getFlowbsterNodeElement(nodeName);
+      // console.log(flowbsterNode.attr('.scaling/min'));
+      nodeCount += flowbsterNode.attr('.scaling/min');
+      console.log(nodeCount);
+    }
+    return nodeCount;
+  }
+
+  /**
    * Create a new flowbster node with unique name on the paper. Informs the user if it was done.
    * @param flowbsterNode Node input form data.
    * @returns an indicator about its success.
    */
   createNode(flowbsterNode: FlowbsterNode): boolean {
+    const existingNodeElement: joint.dia.Element = this.getFlowbsterNodeElement(
+      flowbsterNode.name
+    );
 
-    const existingNodeElement: joint.dia.Element = this.getFlowbsterNodeElement(flowbsterNode.name);
-
-    if (!existingNodeElement && this.actualNodePlacement.x && this.actualNodePlacement.y) {
-
-      const rect = this.initNodeModel(flowbsterNode, this.actualNodePlacement.x, this.actualNodePlacement.y);
+    if (
+      !existingNodeElement &&
+      this.actualNodePlacement.x &&
+      this.actualNodePlacement.y
+    ) {
+      const rect = this.initNodeModel(
+        flowbsterNode,
+        this.actualNodePlacement.x,
+        this.actualNodePlacement.y
+      );
       this.graph.addCell(rect);
       this.emitWorkflowChange();
       return true;
@@ -438,15 +465,16 @@ export class JointService {
    * @returns Indicator about completion.
    */
   cloneNode(flowbsterNode: FlowbsterNode): boolean {
-
     this.unhighlightCellView(this.selectedCellView);
 
-    const existingNodeElement = this.getFlowbsterNodeElement(flowbsterNode.name);
+    const existingNodeElement = this.getFlowbsterNodeElement(
+      flowbsterNode.name
+    );
 
     if (existingNodeElement) {
-
-      const clonedElement =
-        (existingNodeElement.clone() as joint.dia.Element).translate(20, 0).attr('.label/text', flowbsterNode.name + 'CLONE');
+      const clonedElement = (existingNodeElement.clone() as joint.dia.Element)
+        .translate(20, 0)
+        .attr('.label/text', flowbsterNode.name + 'CLONE');
 
       this.graph.addCell(clonedElement);
       this.highlightCellView(this.selectedCellView);
@@ -463,7 +491,6 @@ export class JointService {
    * @returns Indicator about completion.
    */
   updateNode(flowbsterNode: FlowbsterNode): boolean {
-
     // const existingNodeElement: joint.dia.Element = this.getFlowbsterNodeElement(flowbsterNode.name);
 
     // if (!existingNodeElement) {
@@ -501,21 +528,24 @@ export class JointService {
    * @returns Indicator about completion.
    */
   updatePort(portAttributes, isInput: boolean): boolean {
-
     const oldName = this.selectedPortName;
     const newName = portAttributes.displayName;
     const modelAttribute = isInput ? 'inPortsProps' : 'outPortsProps';
     let portProps = this.selectedCellView.model.get(modelAttribute);
 
     if (oldName !== newName) {
-
       if (isInput) {
         this.reRenderInPortAndLink(oldName, newName);
       } else {
         this.reRenderOutPortAndLink(oldName, newName);
       }
 
-      const handledInportsProps = this.handlePortNameChange(oldName, newName, portProps, isInput);
+      const handledInportsProps = this.handlePortNameChange(
+        oldName,
+        newName,
+        portProps,
+        isInput
+      );
       if (handledInportsProps === null) {
         return false;
       } else {
@@ -535,7 +565,9 @@ export class JointService {
    * @param newId The new name to be added to the Outport
    */
   private reRenderOutPortAndLink(oldId: string, newId: string) {
-    const element = this.getElementById(this.selectedCellView.model.id) as joint.shapes.devs.Model;
+    const element = this.getElementById(
+      this.selectedCellView.model.id
+    ) as joint.shapes.devs.Model;
 
     const links = this.getLinks();
 
@@ -547,7 +579,10 @@ export class JointService {
       const sourceElementId = links[i].getSourceElement().id;
       const targetElementId = links[i].getTargetElement().id;
 
-      if (sourceAttrs.port === element.getPort(oldId).id && sourceElementId === element.id) {
+      if (
+        sourceAttrs.port === element.getPort(oldId).id &&
+        sourceElementId === element.id
+      ) {
         const link = new joint.dia.Link({
           source: {
             id: sourceAttrs.id,
@@ -574,13 +609,15 @@ export class JointService {
   }
 
   // multiple linking problems.
-   /**
+  /**
    * ReRenders the old ports links and multicast links with the newly generated port and deletes the old port from the cell.
    * @param oldId The legacy name of the Outport
    * @param newId The new name to be added to the Outport
    */
   private reRenderInPortAndLink(oldId: string, newId: string) {
-    const element = this.getElementById(this.selectedCellView.model.id) as joint.shapes.devs.Model;
+    const element = this.getElementById(
+      this.selectedCellView.model.id
+    ) as joint.shapes.devs.Model;
 
     const links = this.getLinks();
 
@@ -590,7 +627,10 @@ export class JointService {
       const sourceElementId = links[i].getSourceElement().id;
       const targetElementId = links[i].getTargetElement().id;
 
-      if (targetAttrs.port === element.getPort(oldId).id && targetElementId === element.id) {
+      if (
+        targetAttrs.port === element.getPort(oldId).id &&
+        targetElementId === element.id
+      ) {
         const link = new joint.dia.Link({
           source: {
             id: sourceAttrs.id,
@@ -617,7 +657,9 @@ export class JointService {
    * @param newId To be used port name.
    */
   private changeIdOfPort(oldId: string, newId: string): void {
-    const flowsbterNodeModel = this.getElementById(this.selectedCellView.model.id) as joint.shapes.devs.Model;
+    const flowsbterNodeModel = this.getElementById(
+      this.selectedCellView.model.id
+    ) as joint.shapes.devs.Model;
     flowsbterNodeModel.portProp(oldId, 'id', newId);
   }
 
@@ -630,8 +672,12 @@ export class JointService {
    * @param isInput Indicator wether its an In or Out port.
    * @returns The updated property holder object.
    */
-  private handlePortNameChange(oldName: string, newName: string, portProps: InputPort[] | OutputPort[], isInput: boolean)
-    : InputPort[] | OutputPort[] {
+  private handlePortNameChange(
+    oldName: string,
+    newName: string,
+    portProps: InputPort[] | OutputPort[],
+    isInput: boolean
+  ): InputPort[] | OutputPort[] {
     const portType = isInput ? 'inPorts' : 'outPorts';
     const ports = this.selectedCellView.model.get(portType);
     let foundPortIdx = -1;
@@ -644,7 +690,6 @@ export class JointService {
       if (ports[i] === oldName) {
         foundPortIdx = i;
       }
-
     }
 
     portProps[oldName] = undefined;
@@ -666,7 +711,7 @@ export class JointService {
    */
   private getElementById(id: string): joint.dia.Element {
     let element: joint.dia.Element;
-    this.graph.getElements().forEach((el) => {
+    this.graph.getElements().forEach(el => {
       if (el.id === id) {
         element = el;
       }
@@ -683,8 +728,9 @@ export class JointService {
   // adjunk hozzá egy sima portot, adjuk hozzá az id-t az i/o arrayhez, id- alapján állítsuk a propertyket.
   addPort(type: string): void {
     if (this.selectedCellView) {
-
-      const element = this.getElementById(this.selectedCellView.model.id) as joint.shapes.devs.Model;
+      const element = this.getElementById(
+        this.selectedCellView.model.id
+      ) as joint.shapes.devs.Model;
 
       const portCollection = element.attributes[type];
       const portName = _.uniqueId('Port');
@@ -698,7 +744,6 @@ export class JointService {
 
       this.setPortProperties(type, portName);
       this.emitWorkflowChange();
-
     } else {
       console.log('select a cell first'); // we need better error handling
     }
@@ -710,7 +755,7 @@ export class JointService {
    * @param portName  The to be changed ports name.
    */
   private setPortProperties(type: string, portName: string) {
-    const portGroup = (type === 'inPorts' ? 'inPortsProps' : 'outPortsProps');
+    const portGroup = type === 'inPorts' ? 'inPortsProps' : 'outPortsProps';
     const portsProps = this.selectedCellView.model.get(portGroup);
     portsProps[portName] = {};
 
@@ -731,7 +776,7 @@ export class JointService {
    */
   deletePort(): void {
     if (this.selectedCellView && this.selectedPortType) {
-      const portType = (this.selectedPortType === 'out' ? 'outPorts' : 'inPorts');
+      const portType = this.selectedPortType === 'out' ? 'outPorts' : 'inPorts';
       const ports = this.selectedCellView.model.get(portType);
       ports.remove(this.selectedPortName);
       this.selectedCellView.model.set(portType, ports);
@@ -740,7 +785,6 @@ export class JointService {
     } else {
       console.log('select a port first'); // we need better error handling.
     }
-
   }
 
   /**
@@ -755,7 +799,7 @@ export class JointService {
       execurl: '',
       scalingmax: 1,
       scalingmin: 1
-    }
+    };
   }
 
   /**
@@ -766,7 +810,11 @@ export class JointService {
    * @param y Y axis coordinate
    * @returns a data model for a Flowbster Node to be used within the paper.
    */
-  initNodeModel(flowbsterNode: FlowbsterNode, x: number, y: number): joint.shapes.devs.Model {
+  initNodeModel(
+    flowbsterNode: FlowbsterNode,
+    x: number,
+    y: number
+  ): joint.shapes.devs.Model {
     return new joint.shapes.devs.Model({
       position: { x, y },
       size: { width: 100, height: 100 },
@@ -776,7 +824,7 @@ export class JointService {
       outPortsProps: {},
       ports: {
         groups: {
-          'in': {
+          in: {
             attrs: {
               '.port-body': {
                 fill: '#16A085',
@@ -784,7 +832,7 @@ export class JointService {
               }
             }
           },
-          'out': {
+          out: {
             attrs: {
               '.port-body': {
                 fill: '#E74C3C'
@@ -798,7 +846,10 @@ export class JointService {
         '.exename': { text: flowbsterNode.execname },
         '.args': { text: flowbsterNode.args },
         '.exetgz': { text: flowbsterNode.execurl },
-        '.scaling': { min: flowbsterNode.scalingmin, max: flowbsterNode.scalingmax },
+        '.scaling': {
+          min: flowbsterNode.scalingmin,
+          max: flowbsterNode.scalingmax
+        },
         rect: { fill: 'green' },
         text: { fill: '#f4f4f4' }
       }
@@ -826,8 +877,14 @@ export class JointService {
           '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 z' }
         }
       }),
-      validateConnection: function (cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
-
+      validateConnection: function(
+        cellViewS,
+        magnetS,
+        cellViewT,
+        magnetT,
+        end,
+        linkView
+      ) {
         if (magnetS && magnetS.getAttribute('port-group') === 'in') {
           return false;
         }
@@ -837,7 +894,10 @@ export class JointService {
 
         const links = self.getLinks();
         for (let i = 0; i < links.length; i++) {
-          if (cellViewT.model.id === links[i].get('target').id && (magnetT.getAttribute('port') === links[i].get('target').port)) {
+          if (
+            cellViewT.model.id === links[i].get('target').id &&
+            magnetT.getAttribute('port') === links[i].get('target').port
+          ) {
             console.log('nem engedi');
             return false;
           }
@@ -845,11 +905,13 @@ export class JointService {
 
         return magnetT && magnetT.getAttribute('port-group') === 'in';
       },
-      validateMagnet: function (cellView, magnet) {
+      validateMagnet: function(cellView, magnet) {
         const links = self.getLinks();
         for (let i = 0; i < links.length; i++) {
           if (
-            ((cellView.model.id === links[i].get('target').id) && (magnet.getAttribute('port') === links[i].get('target').port))) {
+            cellView.model.id === links[i].get('target').id &&
+            magnet.getAttribute('port') === links[i].get('target').port
+          ) {
             return false;
           }
         }
@@ -880,7 +942,7 @@ export class JointService {
    * Ensures we are listening on all events happening on the paper.
    */
   logAllEventsOnPaper() {
-    this.paper.on('all', function (event, cell) {
+    this.paper.on('all', function(event, cell) {
       console.log(arguments);
     });
   }
@@ -889,9 +951,9 @@ export class JointService {
    * Ensures we are listening on all events happening to the data model.
    */
   logAllEventsOnGraph() {
-    this.graph.on('all', function (event, cell) {
+    this.graph.on('all', function(event, cell) {
       console.log(arguments);
-    })
+    });
   }
 
   /**
@@ -905,7 +967,7 @@ export class JointService {
     const self = this;
 
     // we are going to catch the x,y information from this event to get it ready on the paper.
-    this.paper.on('blank:pointerclick', function (event, x, y) {
+    this.paper.on('blank:pointerclick', function(event, x, y) {
       self.initPlacement(x, y);
       listener[modalTriggerAttribute] = true;
       self.isExistingNodeSubject.next(false);
@@ -920,7 +982,7 @@ export class JointService {
   listenOnGraphChange() {
     const self = this;
 
-    this.graph.on('change', function (cell: joint.dia.Cell) {
+    this.graph.on('change', function(cell: joint.dia.Cell) {
       console.log(this);
       self.emitWorkflowChange();
     });
@@ -940,10 +1002,15 @@ export class JointService {
    * @param outputTriggerAttributeName The property's name on the listener that is going to be triggered if it is an output.
    * @param readOnly Indicator about the papers interactivity.
    */
-  listenOnPointerUp(listener: any, inputTriggerAttributeName: string, outputTriggerAttributeName: string, readOnly: boolean): void {
+  listenOnPointerUp(
+    listener: any,
+    inputTriggerAttributeName: string,
+    outputTriggerAttributeName: string,
+    readOnly: boolean
+  ): void {
     const self = this;
 
-    this.paper.on('cell:pointerup', function (cellView, event, x, y) {
+    this.paper.on('cell:pointerup', function(cellView, event, x, y) {
       const portName = event.target.getAttribute('port');
       if (portName !== null) {
         // save these from the event to the service
@@ -956,9 +1023,7 @@ export class JointService {
           }
           self.setPort(cellView, 'outPortsProps');
           listener[outputTriggerAttributeName] = true; // trigger output modal.
-
         } else if ('in' === self.selectedPortType) {
-
           self.setPort(cellView, 'inPortsProps');
           listener[inputTriggerAttributeName] = true; // trigger input modal.
         }
@@ -975,11 +1040,9 @@ export class JointService {
    * @param attributeName The holder object attributes name you want to use.
    */
   setPort(cellView, attributeName: string): void {
-
     const portAttributes = this.setPortAttributes(cellView, attributeName);
 
     if (undefined !== portAttributes && this.isEmpty(portAttributes)) {
-
       if (attributeName === 'inPortsProps') {
         console.log('setting input');
         this.actualPort = this.initPort('in');
@@ -1004,7 +1067,9 @@ export class JointService {
       return cellView.model.get(attributeName)[this.selectedPortName];
     }
     if (cellView.sourceView) {
-      return cellView.sourceView.model.get(attributeName)[this.selectedPortName];
+      return cellView.sourceView.model.get(attributeName)[
+        this.selectedPortName
+      ];
     } else {
       return cellView.model.get(attributeName)[this.selectedPortName];
     }
@@ -1025,7 +1090,6 @@ export class JointService {
    * @returns a pristine In or Out port.
    */
   private initPort(type: string): InputPort | OutputPort {
-
     if (type === 'in') {
       return this.initInputPort();
     }
@@ -1069,7 +1133,7 @@ export class JointService {
    */
   listenOnCellClick(readOnly: boolean): void {
     const self = this;
-    this.paper.on('cell:pointerclick', function (cellView, event, x, y) {
+    this.paper.on('cell:pointerclick', function(cellView, event, x, y) {
       self.selectCellView(cellView, readOnly);
     });
   }
@@ -1084,7 +1148,7 @@ export class JointService {
    */
   listenOnCellDoubleClick(listener: any, modalTriggerAttribute: string): void {
     const self = this;
-    this.paper.on('cell:pointerdblclick', function (cellView, event, x, y) {
+    this.paper.on('cell:pointerdblclick', function(cellView, event, x, y) {
       self.actualNode = {
         name: self.getSelectedJobsProperty('label', false),
         execname: self.getSelectedJobsProperty('exename', false),
@@ -1105,7 +1169,10 @@ export class JointService {
    * @param cellView The Cell View we want to select.
    * @param readOnly Indicator about the interactivity.
    */
-  private selectCellView(cellView: joint.dia.CellView, readOnly: boolean): void {
+  private selectCellView(
+    cellView: joint.dia.CellView,
+    readOnly: boolean
+  ): void {
     if (cellView !== this.selectedCellView) {
       if (this.selectedCellView != null && !readOnly) {
         this.unhighlightCellView(this.selectedCellView);
@@ -1135,7 +1202,6 @@ export class JointService {
    * @returns The value of the property.
    */
   private getSelectedJobsProperty(name: string, isScale: boolean): string {
-
     if (!this.selectedCellView) {
       return '';
     }
@@ -1147,4 +1213,3 @@ export class JointService {
     return this.selectedCellView.model.attr('.scaling/' + name);
   }
 }
-

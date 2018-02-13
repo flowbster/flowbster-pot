@@ -13,7 +13,7 @@ import {
   MatListModule,
   MatExpansionModule,
   MatProgressSpinnerModule,
-  MatTabsModule
+  MatTabsModule,
 } from '@angular/material';
 
 @NgModule({
@@ -30,7 +30,7 @@ import {
     MatListModule,
     MatExpansionModule,
     MatProgressSpinnerModule,
-    MatTabsModule
+    MatTabsModule,
   ],
   exports: [
     MatTableModule,
@@ -45,7 +45,7 @@ import {
     MatListModule,
     MatExpansionModule,
     MatProgressSpinnerModule,
-    MatTabsModule
+    MatTabsModule,
   ]
 })
 export class MaterialModule {}

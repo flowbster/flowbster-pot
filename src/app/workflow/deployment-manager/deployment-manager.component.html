@@ -4,7 +4,12 @@
   <p-column [style]="{'width':'34px'}" selectionMode="multiple"></p-column>
   <p-column [style]="{'width':'34px'}" expander="true" styleClass="col-icon"></p-column>
   <p-column field="name" [sortable]="true" header="Name" [filter]="true" filterPlaceholder="Search" filterMatchMode="contains"></p-column>
-  <p-column field="deployType" [sortable]="true" header="Deployment Type"></p-column>
+  <p-column header="Progress">
+    <ng-template let-entry="rowData" pTemplate="body">
+      <p-progressBar [value]="entry.nodeProgress"></p-progressBar>
+    </ng-template>
+
+  </p-column>
   <p-column field="edit" header="Actions">
     <ng-template let-entry="rowData" pTemplate="body">
       <button type="button" pTooltip="Workflow Information" tooltipPosition="bottom" pButton icon="fa-pencil-square-o" (click)="onInfoClicked(entry)"></button>

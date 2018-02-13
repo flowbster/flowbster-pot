@@ -102,6 +102,12 @@ export class BuildContextPropertiesComponent implements OnInit {
         this.deployment.nodeCollection = this.populateCollection(
           this.buildTemplate.graph
         );
+        this.deployment.targetNodeCount = this.getTargetNodes(
+          this.buildTemplate.graph
+        );
+        this.deployment.nodeProgress = Math.round(
+          100 / this.deployment.targetNodeCount
+        );
         this.onSubmitDialog.emit(this.deployment);
 
         // reset the form.
@@ -122,5 +128,10 @@ export class BuildContextPropertiesComponent implements OnInit {
   private populateCollection(graphText: string): string[] {
     this.jointSVC.uploadGraph(JSON.parse(graphText));
     return this.jointSVC.getNodeNames();
+  }
+
+  private getTargetNodes(graphText: string): number {
+    this.jointSVC.uploadGraph(JSON.parse(graphText));
+    return this.jointSVC.getDeploymentNodeCount();
   }
 }

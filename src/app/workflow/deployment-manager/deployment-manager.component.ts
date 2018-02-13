@@ -65,7 +65,7 @@ export class DeploymentManagerComponent extends ManagerComponent<
             .getWorkflowInformation(deployment.infraid)
             .subscribe((infraCollection: InfraInfo[]) => {
               this.updateNodeCollection(deployment, infraCollection);
-            });
+            }); // csak akkor szerzünk workflow detail információkat, hogyha rá kattint. ITT CSAK A PROGRESS BART NÖVELJÜK.
         } else if (data.event_name === 'nodedropped') {
           // this.occoSVC
           //   .getWorkflowInformation(deployment.infraid)
